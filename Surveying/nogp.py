@@ -5,14 +5,15 @@ from time import *
 import time
 import threading
 import json,httplib
-import serial
+# import serial
+import pprint
 
-gpsd = None 
+# gpsd = None 
 os.system('clear')
 fo = open("filin1", "w")
-port = serial.Serial("/dev/ttyAMA0", baudrate=115200)
-start = ";"
-stop = "/"
+# port = serial.Serial("/dev/ttyAMA0", baudrate=115200)
+# start = ";"
+# stop = "/"
  
 #class GpsPoller(threading.Thread):
 #  def __init__(self):
@@ -197,25 +198,37 @@ if __name__ == '__main__':
 
             print_cells(parsed_cells)
 
+        def dissect(text):
+		    data = {}
+		    for name, length in fields:
+		        data[name] = text[:length].rstrip()
+		        text = text[length:]
+		    return data
+
         print
-        print ' Wifi reading'
-        print '----------------------------------------'
-        fo.write("\n")
-        fo.write("Wifi reading\n")
-        fo.write("----------------------------------------\n")
-        fo.write("Signal strength\n")
-        fo.write('%d' % stren)
-        fo.write("  dBm")
-        fo.write("\n")
-        fo.write("end entry\n")
-        fo.write("\n")
-        mtar()
+        # print ' Wifi reading'
+        # print '----------------------------------------'
+        # fo.write("\n")
+        # fo.write("Wifi reading\n")
+        # fo.write("----------------------------------------\n")
+        # fo.write("Signal strength\n")
+        # fo.write('%d' % stren)
+        # fo.write("  dBm")
+        # fo.write("\n")
+        # fo.write("end entry\n")
+        # fo.write("\n")
+        #getting string value
+        # mtar()
+        # print str(mtar())
+        # print float(str(mtar()))
         print i
         fo.write('%d' % i)
         fo.write("\n")
         i = i + 1
         # print result
         time.sleep(2)
+        mtar()
+		# dissect(mtar())
          
   except (KeyboardInterrupt, SystemExit): 
     print "\nKilling Thread..."

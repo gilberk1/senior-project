@@ -5,34 +5,34 @@ from time import *
 import time
 import threading
 import json,httplib
-import serial
+# import serial
 
-gpsd = None 
-os.system('clear')
+# gpsd = None 
+# os.system('clear')
 fo = open("filin1", "w")
-port = serial.Serial("/dev/ttyAMA0", baudrate=19200)
-start = ";"
-stop = "#"
+# port = serial.Serial("/dev/ttyAMA0", baudrate=19200)
+# start = ";"
+# stop = "#"
  
-class GpsPoller(threading.Thread):
- def __init__(self):
-   threading.Thread.__init__(self)
-   global gpsd #bring it in scope
-   gpsd = gps(mode=WATCH_ENABLE)
-   self.current_value = None
-   self.running = True
+# class GpsPoller(threading.Thread):
+#  def __init__(self):
+#    threading.Thread.__init__(self)
+#    global gpsd #bring it in scope
+#    gpsd = gps(mode=WATCH_ENABLE)
+#    self.current_value = None
+#    self.running = True
 
- def run(self):
-   global gpsd
-   while gpsp.running:
-     gpsd.next() 
+#  def run(self):
+#    global gpsd
+#    while gpsp.running:
+#      gpsd.next() 
 lat = 32.93
 lon = 40.93
 stren = -60
 i = 1
 
 if __name__ == '__main__':
-  gpsp = GpsPoller() 
+  #gpsp = GpsPoller() 
   try:
     gpsp.start()
   except Exception, r:
@@ -204,6 +204,10 @@ if __name__ == '__main__':
 
             print_cells(parsed_cells)
 
+            for cell in cells:
+                # get_quality now returns an integer
+                print get_dBm(cell)
+
         print
         print ' Wifi reading'
         print '----------------------------------------'
@@ -217,7 +221,7 @@ if __name__ == '__main__':
         fo.write("end entry\n")
         fo.write("\n")
         mtar()
-        port.write(start+"-55"+":"+"40.27419459"+","+"-74.77772407"+stop)
+        #port.write(start+"-55"+":"+"40.27419459"+","+"-74.77772407"+stop)
         time.sleep(2)
         print i
         fo.write('%d' % i)
