@@ -174,7 +174,7 @@ if __name__ == '__main__':
                 fo.write("\n")
          
             for cell in cells:
-                # get_dBm now returns an integer
+                # dBm cell
                 print get_dBm(cell)
                 fo.write(str(get_dBm(cell)))
                 fo.write("\n")
@@ -197,19 +197,21 @@ if __name__ == '__main__':
         line2 = fo.readline()
         line3 = fo.readline()
         print "Read Line: %s" % (line)
-
-        if line1 == "IsthistheKrustyKrab" || line2 == "IsthistheKrustyKrab" || line3 == "IsthistheKrustyKrab" :
-            pointer = fo.tell()
-            fo.seek(4,0)
-            line = fo.readline()
-            newpoint = fo.tell()
-            if pointer == newpoint+3 :
-
-            	pass
+        #Sifting through Output textfile to find TCNJ-DOT1X data
+        if line1 == "TCNJ-DOT1X" || line2 == "TCNJ-DOT1X" || line3 == "TCNJ-DOT1X" :
+            pointer = int(fo.tell())
+            fo.seek(4+pointer,0)
+            dbm_val = fo.readline()
+            fo.write(dbm_val)
+            fo.write("\n")
+            pointer = int(fo.tell())
+            fo.seek(4+pointer,0)
+            address_val = fo.readline()
+            fo.write(address_val)
+            fo.write("\n")
+            fo.write("complete\n")
+            
         	pass
-        # Again set the pointer to the beginning
-        # fo.seek(0, 0)
-        # print "Read Line: %s" % (line)
         time.sleep(2)
 
   except (KeyboardInterrupt, SystemExit): 
