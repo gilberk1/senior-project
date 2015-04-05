@@ -42,18 +42,18 @@ if __name__ == '__main__':
  
         os.system('clear')
  
-        print
-        print ' GPS reading'   
-        print '----------------------------------------'
-        print 'latitude    ' , lat
-        print 'longitude   ' , lon
-        fo.write("GPS reading\n")
-        fo.write("----------------------------------------\n")
-        fo.write("latitude\n")
-        fo.write('%d' % lat)
-        fo.write("\n")
-        fo.write("longitude\n")
-        fo.write('%d' % lon)
+        # print
+        # print ' GPS reading'   
+        # print '----------------------------------------'
+        # print 'latitude    ' , lat
+        # print 'longitude   ' , lon
+        # fo.write("GPS reading\n")
+        # fo.write("----------------------------------------\n")
+        # fo.write("latitude\n")
+        # fo.write('%d' % lat)
+        # fo.write("\n")
+        # fo.write("longitude\n")
+        # fo.write('%d' % lon)
         fo.write("\n")
 
         lat = lat + 1
@@ -208,27 +208,26 @@ if __name__ == '__main__':
                 # get_quality now returns an integer
                 print get_dBm(cell)
 
-        print
-        print ' Wifi reading'
-        print '----------------------------------------'
-        fo.write("\n")
-        fo.write("Wifi reading\n")
-        fo.write("----------------------------------------\n")
-        fo.write("Signal strength\n")
-        fo.write('%d' % stren)
-        fo.write("  dBm")
-        fo.write("\n")
-        fo.write("end entry\n")
+        # print
+        # print ' Wifi reading'
+        # print '----------------------------------------'
+        # fo.write("\n")
+        # fo.write("Wifi reading\n")
+        # fo.write("----------------------------------------\n")
+        # fo.write("Signal strength\n")
+        # fo.write('%d' % stren)
+        # fo.write("  dBm")
+        # fo.write("\n")
+        # fo.write("end entry\n")
         fo.write("\n")
         mtar()
         #port.write(start+"-55"+":"+"40.27419459"+","+"-74.77772407"+stop)
-        time.sleep(2)
+        time.sleep(1)
         print i
         fo.write('%d' % i)
         fo.write("\n")
         i = i + 1
-        # print result
-        time.sleep(2)
+
          
   except (KeyboardInterrupt, SystemExit): 
     print "\nKilling Thread..."

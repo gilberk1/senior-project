@@ -1,61 +1,27 @@
 import os, sys
 import subprocess
-#from gps import *
 from time import *
 import time
 import threading
 import json,httplib
-# import serial
-import pprint
 
-# gpsd = None 
-os.system('clear')
-fo = open("filin2", "w")
-# port = serial.Serial("/dev/ttyAMA0", baudrate=115200)
-# start = ";"
-# stop = "/"
- 
-#class GpsPoller(threading.Thread):
-#  def __init__(self):
-#    threading.Thread.__init__(self)
-#    global gpsd #bring it in scope
-#    gpsd = gps(mode=WATCH_ENABLE)
-#    self.current_value = None
-#    self.running = True
-# 
-#  def run(self):
-#    global gpsd
-#    while gpsp.running:
-#      gpsd.next() 
+
+fo = open("filin1", "rw+")
+
 lat = 32.93
 lon = 40.93
 stren = -60
 i = 1
 
 if __name__ == '__main__':
-  #gpsp = GpsPoller() 
   try:
-    #gpsp.start()
+    gpsp.start()
+  except Exception, r:
+    print "no GPS found continuing with procedure"
+    print r
     while True:
  
         os.system('clear')
- 
-        print
-        print ' GPS reading'   
-        print '----------------------------------------'
-        print 'latitude    ' , lat
-        print 'longitude   ' , lon
-        fo.write("GPS reading\n")
-        fo.write("----------------------------------------\n")
-        fo.write("latitude\n")
-        fo.write('%d' % lat)
-        fo.write("\n")
-        fo.write("longitude\n")
-        fo.write('%d' % lon)
-        fo.write("\n")
-
-        lat = lat + 1
-        lon = lon + 1
     
         interface = "wlan0"
 
@@ -160,18 +126,22 @@ if __name__ == '__main__':
             print_table(table)
 
         # Try to upload to Parse
-        # connection = httplib.HTTPSConnection('api.parse.com', 443)
-        # connection.connect()
-        # connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
-        #        "latitude": lat,
-        #        "longitude": lon,
-        #        "strength": stren,
-        #      }), {
-        #        "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
-        #        "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
-        #        "Content-Type": "application/json"
-        #      })
-        # result = json.loads(connection.getresponse().read())
+        try:
+            connection = httplib.HTTPSConnection('api.parse.com', 443)
+            connection.connect()
+            connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
+                   "latitude": lat,
+                   "longitude": lon,
+                   "strength": stren,
+                 }), {
+                   "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
+                   "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
+                   "Content-Type": "application/json"
+                 })
+            result = json.loads(connection.getresponse().read())
+        except Exception, e:
+            print "there was an error connecting to parse"
+            print e
 
         def mtar():
             """Pretty prints the output of iwlist scan into a table"""
@@ -189,50 +159,60 @@ if __name__ == '__main__':
                     line = cell_line[-27:]
                 cells[-1].append(line.rstrip())
 
-            cells=cells[1:]
+            cells=cells[1:4]
 
             for cell in cells:
                 parsed_cells.append(parse_cell(cell))
 
             sort_cells(parsed_cells)
+            # print_cells(parsed_cells)
 
-            print_cells(parsed_cells)
+            for cell in cells:
+                # name cell
+                print get_name(cell)
+                fo.write(str(get_name(cell)))
+                fo.write("\n")
+         
+            for cell in cells:
+                # get_dBm now returns an integer
+                print get_dBm(cell)
+                fo.write(str(get_dBm(cell)))
+                fo.write("\n")
 
-      #   def dissect(text):
-		    # data = {}
-		    # for name, length in fields:
-		    #     data[name] = text[:length].rstrip()
-		    #     text = text[length:]
-		    # return data
+            for cell in cells:
+                # address cell
+                print get_address(cell)
+                fo.write(str(get_address(cell)))
+                fo.write("\n")
 
-        print
-        print ' Wifi reading'
-        print '----------------------------------------'
-        fo.write("\n")
-        fo.write("Wifi reading\n")
-        fo.write("----------------------------------------\n")
-        fo.write("Signal strength\n")
-        fo.write('%d' % stren)
-        fo.write("  dBm")
-        fo.write("\n")
-        fo.write("end entry\n")
-        fo.write("\n")
-        #getting string value
         mtar()
-        # print str(mtar())
-        # print float(str(mtar()))
+        i = i + 1
         print i
         fo.write('%d' % i)
         fo.write("\n")
-        i = i + 1
-        # print result
+        fo.write("end entry\n")
+        print "end entry\n"
+
+        line1 = fo.readline()
+        line2 = fo.readline()
+        line3 = fo.readline()
+        print "Read Line: %s" % (line)
+
+        if line1 == "IsthistheKrustyKrab" || line2 == "IsthistheKrustyKrab" || line3 == "IsthistheKrustyKrab" :
+            pointer = fo.tell()
+            fo.seek(4,0)
+            line = fo.readline()
+            newpoint = fo.tell()
+            if pointer == newpoint+3 :
+
+            	pass
+        	pass
+        # Again set the pointer to the beginning
+        # fo.seek(0, 0)
+        # print "Read Line: %s" % (line)
         time.sleep(2)
-        mtar()
-		# dissect(mtar())
-         
+
   except (KeyboardInterrupt, SystemExit): 
     print "\nKilling Thread..."
     fo.close()
-    # gpsp.running = False
-    # gpsp.join()
   print "Done.\nExiting."
