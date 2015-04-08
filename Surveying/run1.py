@@ -203,11 +203,24 @@ if __name__ == '__main__':
         so.next()
         gi = so.readline(19)
         #so.next()
-        if li == "IsthistheKrustyKrab" or fi == "IsthistheKrustyKrab" or gi == "IsthistheKrustyKrab" :
-
+        if li == "IsthistheKrustyKrab":
+            first_dBm = do.readline(4)
+            first_address = go.readline(34)
         	pass
-
-
+        if fi == "IsthistheKrustyKrab":        	
+        	point = do.next()
+        	point = go.next()
+        	second_dBm = do.readline(4)
+            second_address = go.readline(34)
+        	pass
+        if gi == "IsthistheKrustyKrab":       	
+        	point = do.next()
+        	point = do.next()
+        	point = go.next()
+        	point = go.next()
+            third_dBm = do.readline(4)
+            third_address = go.readline(34) 
+        	pass
 
         # #Sifting through Output textfile to find TCNJ-DOT1X data
         # if line1 == "TCNJ-DOT1X" || line2 == "TCNJ-DOT1X" || line3 == "TCNJ-DOT1X" :
