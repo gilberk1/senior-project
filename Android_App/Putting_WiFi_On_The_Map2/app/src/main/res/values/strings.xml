@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Putting Wifi On The Map</string>
+    <string name="wifi_tracker">WiFi Tracker</string>
+    <string name="action_settings">Settings</string>
+    <string name="full_wifi_map">Full Wifi Map</string>
+    <string name="signal_strength">Signal Strength</string>
+    <string name="help">info</string>
+    <string name="wifi1">First Wifi</string>
+    <string name="wifi2">Second Wifi</string>
+    <string name="back">Back</string>
+    <string name="textLat">Latitude: </string>
+    <string name="textLong">Longitude: </string>
+    <string name="wifi">Wifi Link Speed: </string>
+    <string name="rssi">RSSI: </string>
+    <string name="update">Update</string>
+    <string name="latitude">Latitude:</string>
+    <string name="longitude">Longitude:</string>
+    <string name="signal">Wi-Fi Signal:</string>
+    <string name="info">The goal of team Putting Wi-Fi On the Map is to\nprovide students on the TCNJ
+        campus with a fully\nfeatured cell telephone application that provides\ninformation regarding
+        the school’s Wi-Fi signal\navailability. Users report Wi-Fi status to collect\nand record
+        data pertaining to the location and\nstrength of Wi-Fi signals across campus. Data collected
+        from user devices will be uploaded to a\ndatabase and software will calibrate different
+        \ndevices’ data to provide a common data format.\nThe data will be processed to produce a
+        “heat\nmap” representing the Wi-Fi signal quality on the TCNJ campus. A legend will be
+        provided that\nexpresses the relationship between the heat map\ncolors and the received
+        signal power at the\ndevice’s front-end amplifier.\n\nThis mobile application was created
+        by:\nAlexander Cook\nAbdoulaye Diallo\nKari Gilbertson\nNicholas Vitone</string>
+
+
+</resources>

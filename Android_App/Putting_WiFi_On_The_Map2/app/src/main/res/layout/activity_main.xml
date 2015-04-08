@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="@color/grey"
+    tools:context=".MainActivity">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/signal_strength"
+        android:textSize="45sp"
+        android:background="@drawable/buttons"
+        android:id="@+id/signal_strength_button"
+        android:fontFamily="futura"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="buttonOnClick" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/full_wifi_map"
+        android:textSize="43sp"
+        android:background="@drawable/buttons"
+        android:id="@+id/full_wifi_button"
+        android:fontFamily="futura"
+        android:layout_below="@+id/signal_strength_button"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="38dp"
+        android:onClick="buttonOnClick" />
+
+    <Button
+        android:layout_width="50sp"
+        android:layout_height="50sp"
+        android:background="@drawable/circle"
+        android:id="@+id/help_button"
+        android:text="@string/help"
+        android:textSize="20sp"
+        android:fontFamily="futura"
+        android:layout_alignParentBottom="false"
+        android:layout_marginTop="430dp"
+        android:onClick="buttonOnClick"
+        android:layout_alignParentRight="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wifi_tracker"
+        android:src="@drawable/wifi_tracker"
+        android:layout_above="@+id/signal_strength_button"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/logo"
+        android:src="@drawable/tcnj_logo"
+        android:layout_below="@+id/full_wifi_button"
+        android:layout_alignParentStart="false"
+        android:layout_alignEnd="@id/help_button"
+        android:layout_marginRight="230dp"
+        android:layout_marginTop="25dp" />
+
+</RelativeLayout>

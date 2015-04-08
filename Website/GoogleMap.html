@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Heatmap</title>
+    <style>
+      html, body, #map-canvas
+      {
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+      }
+      #panel
+      {
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        margin-left: -180px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=visualization"></script>
+    <script src="http://www.parsecdn.com/js/parse-1.3.4.min.js"></script>
+    <script>
+
+// Adding 500 Data Points
+var map, pointarray, heatmap, locations;
+var gmap, mapCanvas, mapOptions = {zoomControl: true, streetViewControl: false, noClear: true };
+    function mapInitialize( mapCenter, mapZoom ) {
+        mapOptions.center = mapCenter;
+        mapOptions.zoom = mapZoom;
+        mapCanvas.setAttribute( "style", "height:" + window.innerHeight + "px;" );
+        setTimeout( function() {
+                gmap = new google.maps.Map( mapCanvas, mapOptions );
+        }, 20 );
+    }
+    window.onorientationchange = function() {
+        mapInitialize( gmap.getCenter(), gmap.getZoom() );
+    }
+
+function initialize()
+{
+  var mapOptions =
+  {
+    zoom: 16,
+    center: new google.maps.LatLng(40.2685, -74.7777),
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+      mapOptions);
+
+  // Connect to Parse
+  Parse.initialize("W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM", "440W9IceQ00wcDL1nDAE8ieREow7abC0cR2lH9yF");
+  var Location = Parse.Object.extend("Location");
+  var query = new Parse.Query(Location);
+ 
+  // Query parse for the locations
+  query.find(
+  {
+    success: function(results)
+    {
+      locations = results.map(function(result)
+      {
+        return{
+          location: checkCoordinates(new google.maps.LatLng(result.get("latitude"), result.get("longitude"))),
+          weight: changeWeight(result.get("strength"))
+        }
+      });
+        pointArray = new google.maps.MVCArray(locations);
+        heatmap = new google.maps.visualization.HeatmapLayer(
+        {
+          data: pointArray
+        });
+        heatmap.setMap(map);
+    },
+    error: function(error)
+    {
+        alert("Error: " + error.code + " " + error.message);
+    }
+  });
+}
+
+function checkCoordinates(result)
+{
+  var coordinates =
+  [
+    new google.maps.LatLng(40.2684, -74.7838),
+    new google.maps.LatLng(40.2723, -74.7822),
+    new google.maps.LatLng(40.2735, -74.7770),
+    new google.maps.LatLng(40.2695, -74.7720),
+    new google.maps.LatLng(40.2661, -74.7720),
+    new google.maps.LatLng(40.2642, -74.7750),
+    new google.maps.LatLng(40.2632, -74.7815)
+  ];
+
+  var polygon = new google.maps.Polygon(
+  {
+    paths: coordinates,
+  });
+
+  var inPolygon = isWithinPolygon(result, polygon);
+
+  if(inPolygon)
+  {
+    return result;
+  }
+  else
+  {
+    return new google.maps.LatLng(null, null);
+  }
+}
+
+function changeWeight(result)
+{
+  if(result <= 0 && result > -45)
+  {
+    result = result + 9000;
+    return result;
+  }
+  else if(result <= -45 && result > -65)
+  {
+    result = result + 8000;
+    return result;
+  }
+  else if(result <= -65 && result > -75)
+  {
+    result = result + 7000;
+    return result;
+  }
+  else if(result <= -75 && result > -85)
+  {
+    result = result + 6000;
+    return result;
+  }
+  else if(result <= -85 && result > -90)
+  {
+    result = result + 5000;
+    return result;
+  }
+  else
+  {
+    result = 0;
+    return result;
+  }
+}
+function isWithinPolygon(coordinate, polygon)
+{
+  var oddNodes = false;
+  var x = coordinate.lat();
+  var y = coordinate.lng();
+  var bounds = polygon.getPath();
+
+  if((x > bounds.getAt(0).lat()) && (y > bounds.getAt(0).lng()))
+  {
+    if((x < bounds.getAt(1).lat()) && (y > bounds.getAt(1).lng()))
+    {
+      if((x < bounds.getAt(2).lat()) && (y < bounds.getAt(2).lng()))
+      {
+        if((x > bounds.getAt(3).lat()) && (y < bounds.getAt(3).lng()))
+        {
+          if((x > bounds.getAt(4).lat()) && (y < bounds.getAt(4).lng()))
+          {
+            if((x > bounds.getAt(5).lat()) && (y < bounds.getAt(5).lng()))
+            {
+              if((x > bounds.getAt(6).lat()) && (y > bounds.getAt(6).lng()))
+              {
+                oddNodes = true;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return oddNodes;
+}
+
+function changeGradient()
+{
+  var gradient =
+  [
+    'rgba(0, 255, 255, 0)',
+    'rgba(0, 255, 255, 1)',
+    'rgba(0, 191, 255, 1)',
+    'rgba(0, 127, 255, 1)',
+    'rgba(0, 63, 255, 1)',
+    'rgba(0, 0, 255, 1)',
+    'rgba(0, 0, 223, 1)',
+    'rgba(0, 0, 191, 1)',
+    'rgba(0, 0, 159, 1)',
+    'rgba(0, 0, 127, 1)',
+    'rgba(63, 0, 91, 1)',
+    'rgba(127, 0, 63, 1)',
+    'rgba(191, 0, 31, 1)',
+    'rgba(255, 0, 0, 1)'
+  ]
+  heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+  </head>
+
+  <body>
+    <div id="panel">
+      <button onclick="changeGradient()">Change gradient</button>
+    </div>
+    <div id="map-canvas"></div>
+  </body>
+</html>
