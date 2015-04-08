@@ -165,25 +165,28 @@ if __name__ == '__main__':
                 parsed_cells.append(parse_cell(cell))
 
             sort_cells(parsed_cells)
-            # print_cells(parsed_cells)
 
+            so = open("namefil", "r+")
             for cell in cells:
                 # name cell
-                print get_name(cell)
-                fo.write(str(get_name(cell)))
-                fo.write("\n")
-         
+                sa = str(get_name(cell))
+                so.write(sa)
+                so.write("\n")
+            so.close()
+            do = open("dBmfil", "r+")
             for cell in cells:
                 # dBm cell
-                print get_dBm(cell)
-                fo.write(str(get_dBm(cell)))
-                fo.write("\n")
-
+                da = str(get_dBm(cell))
+                do.write(da)
+                do.write("\n")
+            do.close()
+            go = open("addressfil", "r+")
             for cell in cells:
                 # address cell
-                print get_address(cell)
-                fo.write(str(get_address(cell)))
-                fo.write("\n")
+                ga = str(get_address(cell))
+                go.write(fa)
+                go.write("\n")
+            go.close()
 
         mtar()
         i = i + 1
@@ -193,25 +196,34 @@ if __name__ == '__main__':
         fo.write("end entry\n")
         print "end entry\n"
 
-        line1 = fo.readline()
-        line2 = fo.readline()
-        line3 = fo.readline()
-        print "Read Line: %s" % (line)
-        #Sifting through Output textfile to find TCNJ-DOT1X data
-        if line1 == "TCNJ-DOT1X" || line2 == "TCNJ-DOT1X" || line3 == "TCNJ-DOT1X" :
-            pointer = int(fo.tell())
-            fo.seek(4+pointer,0)
-            dbm_val = fo.readline()
-            fo.write(dbm_val)
-            fo.write("\n")
-            pointer = int(fo.tell())
-            fo.seek(4+pointer,0)
-            address_val = fo.readline()
-            fo.write(address_val)
-            fo.write("\n")
-            fo.write("complete\n")
-            
+        so.seek(0,0)
+        li = so.readline(19)
+        so.next()
+        fi = so.readline(19)
+        so.next()
+        gi = so.readline(19)
+        #so.next()
+        if li == "IsthistheKrustyKrab" or fi == "IsthistheKrustyKrab" or gi == "IsthistheKrustyKrab" :
+
         	pass
+
+
+
+        # #Sifting through Output textfile to find TCNJ-DOT1X data
+        # if line1 == "TCNJ-DOT1X" || line2 == "TCNJ-DOT1X" || line3 == "TCNJ-DOT1X" :
+        #     pointer = int(fo.tell())
+        #     fo.seek(4+pointer,0)
+        #     dbm_val = fo.readline()
+        #     fo.write(dbm_val)
+        #     fo.write("\n")
+        #     pointer = int(fo.tell())
+        #     fo.seek(4+pointer,0)
+        #     address_val = fo.readline()
+        #     fo.write(address_val)
+        #     fo.write("\n")
+        #     fo.write("complete\n")
+            
+        # 	pass
         time.sleep(2)
 
   except (KeyboardInterrupt, SystemExit): 
