@@ -5,12 +5,8 @@ import time
 import threading
 import json,httplib
 
+fo = open("log", "a+")
 
-fo = open("filin1", "rw+")
-
-lat = 32.93
-lon = 40.93
-stren = -60
 i = 1
 
 if __name__ == '__main__':
@@ -22,6 +18,25 @@ if __name__ == '__main__':
     while True:
  
         os.system('clear')
+
+        print 'latitude    ' , gpsd.fix.latitude
+        print 'longitude   ' , gpsd.fix.longitude
+        print 'time utc    ' , gpsd.utc,' + ', gpsd.fix.time
+        print 'altitude (m)' , gpsd.fix.altitude
+        fo.write("GPS reading\n")
+        fo.write("----------------------------------------\n")
+        fo.write("latitude\n")
+        fo.write('%d' % gpsd.fix.latitude)
+        fo.write("\n")
+        fo.write("longitude\n")
+        fo.write('%d' % gpsd.fix.longitude)
+        fo.write("\n")
+        fo.write("time utc\n")
+        fo.write('%d' % gpsd.utc,' + ', gpsd.fix.time)
+        fo.write("\n")
+        fo.write("altitude (m) \n")
+        fo.write('%d' % gpsd.fix.altitude)
+        fo.write("\n")       
     
         interface = "wlan0"
 
@@ -125,24 +140,6 @@ if __name__ == '__main__':
                 table.append(cell_properties)
             print_table(table)
 
-        # Try to upload to Parse
-        try:
-            connection = httplib.HTTPSConnection('api.parse.com', 443)
-            connection.connect()
-            connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
-                   "latitude": lat,
-                   "longitude": lon,
-                   "strength": stren,
-                 }), {
-                   "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
-                   "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
-                   "Content-Type": "application/json"
-                 })
-            result = json.loads(connection.getresponse().read())
-        except Exception, e:
-            print "there was an error connecting to parse"
-            print e
-
         def mtar():
             """Pretty prints the output of iwlist scan into a table"""
             
@@ -189,6 +186,7 @@ if __name__ == '__main__':
             go.close()
 
         mtar()
+        
         i = i + 1
         print i
         fo.write('%d' % i)
@@ -202,44 +200,97 @@ if __name__ == '__main__':
         fi = so.readline(19)
         so.next()
         gi = so.readline(19)
-        #so.next()
+
         if li == "IsthistheKrustyKrab":
             first_dBm = do.readline(4)
             first_address = go.readline(34)
+            fo.write(first_dBm)
+            fo.write("\n")
+            fo.write(first_address)
+            fo.write("\n")
+            try:
+                connection = httplib.HTTPSConnection('api.parse.com', 443)
+                connection.connect()
+                connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
+                       "latitude": gpsd.fix.latitude,
+                       "longitude": gpsd.fix.longitude,
+                       "strength": first_dBm,
+                     }), {
+                       "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
+                       "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
+                       "Content-Type": "application/json"
+                     })
+                result = json.loads(connection.getresponse().read())
+            except Exception, e:
+                fo.write("no connect\n")
+                print "there was an error connecting to parse"
+                print e
+            	pass                        
         	pass
         if fi == "IsthistheKrustyKrab":        	
-        	point = do.next()
-        	point = go.next()
-        	second_dBm = do.readline(4)
+        	  point = do.next()
+        	  point = go.next()
+        	  second_dBm = do.readline(4)
             second_address = go.readline(34)
+            fo.write(second_dBm)
+            fo.write("\n")
+            fo.write(second_address)
+            fo.write("\n")
+            try:
+                connection = httplib.HTTPSConnection('api.parse.com', 443)
+                connection.connect()
+                connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
+                       "latitude": gpsd.fix.latitude,
+                       "longitude": gpsd.fix.longitude,
+                       "strength": second_dBm,
+                     }), {
+                       "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
+                       "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
+                       "Content-Type": "application/json"
+                     })
+                result = json.loads(connection.getresponse().read())
+            except Exception, e:
+                fo.write("no connect\n")
+                print "there was an error connecting to parse"
+                print e
+            	pass            
         	pass
         if gi == "IsthistheKrustyKrab":       	
-        	point = do.next()
-        	point = do.next()
-        	point = go.next()
-        	point = go.next()
+        	  point = do.next()
+        	  point = do.next()
+        	  point = go.next()
+        	  point = go.next()
             third_dBm = do.readline(4)
-            third_address = go.readline(34) 
-        	pass
-
-        # #Sifting through Output textfile to find TCNJ-DOT1X data
-        # if line1 == "TCNJ-DOT1X" || line2 == "TCNJ-DOT1X" || line3 == "TCNJ-DOT1X" :
-        #     pointer = int(fo.tell())
-        #     fo.seek(4+pointer,0)
-        #     dbm_val = fo.readline()
-        #     fo.write(dbm_val)
-        #     fo.write("\n")
-        #     pointer = int(fo.tell())
-        #     fo.seek(4+pointer,0)
-        #     address_val = fo.readline()
-        #     fo.write(address_val)
-        #     fo.write("\n")
-        #     fo.write("complete\n")
-            
-        # 	pass
+            third_address = go.readline(34)
+            fo.write(third_dBm)
+            fo.write("\n")
+            fo.write(third_address)
+            fo.write("\n")
+            # Try to upload to Parse
+            try:
+                connection = httplib.HTTPSConnection('api.parse.com', 443)
+                connection.connect()
+                connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
+                       "latitude": gpsd.fix.latitude,
+                       "longitude": gpsd.fix.longitude,
+                       "strength": third_dBm,
+                     }), {
+                       "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
+                       "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
+                       "Content-Type": "application/json"
+                     })
+                result = json.loads(connection.getresponse().read())
+            except Exception, e:
+                fo.write("no connect\n")
+                print "there was an error connecting to parse"
+                print e
+            	pass
+        
         time.sleep(2)
 
-  except (KeyboardInterrupt, SystemExit): 
+  except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
     print "\nKilling Thread..."
+    gpsp.running = False
+    gpsp.join() # wait for the thread to finish what it's doing
     fo.close()
   print "Done.\nExiting."
