@@ -4,10 +4,14 @@ from time import *
 import time
 import threading
 import json,httplib
+import serial
 
 fo = open("log", "a+")
 
 i = 1
+gpsd = None #seting the global variable
+start = ";"
+stop = "#"
 
 if __name__ == '__main__':
   try:
@@ -208,6 +212,7 @@ if __name__ == '__main__':
             fo.write("\n")
             fo.write(first_address)
             fo.write("\n")
+            port.write(start+str(first_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
             try:
                 connection = httplib.HTTPSConnection('api.parse.com', 443)
                 connection.connect()
@@ -236,6 +241,7 @@ if __name__ == '__main__':
             fo.write("\n")
             fo.write(second_address)
             fo.write("\n")
+            port.write(start+str(second_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
             try:
                 connection = httplib.HTTPSConnection('api.parse.com', 443)
                 connection.connect()
@@ -266,6 +272,7 @@ if __name__ == '__main__':
             fo.write("\n")
             fo.write(third_address)
             fo.write("\n")
+            port.write(start+str(third_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
             # Try to upload to Parse
             try:
                 connection = httplib.HTTPSConnection('api.parse.com', 443)
