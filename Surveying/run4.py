@@ -43,8 +43,8 @@ class GpsPoller(threading.Thread):
 
 if __name__ == '__main__':
     gpsp = GpsPoller()
+    gpsp.start()
     while True:
-    	gpsp.start()
         fo = open("log", "a+")
         fo.write("GPS reading\n")
         fo.write("----------------------------------------\n")
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         interface = "wlan0"
 
         def get_name(cell):
-            return matching_line(cell,"ESSID:")[1:-1]          
+            return matching_line(cell,"ESSID:")[1:-1]     
 
         #Convert quality to dBm
         def get_dBm(cell):
@@ -249,17 +249,17 @@ if __name__ == '__main__':
                 pass                        
             pass
 
-        mtar()
-        # i = i + 1
-        # print i
-        # fo.write('%d' % i)
-        # fo.write("\n")
+        mtar()   
         fo.write("end entry\n")
         print "end entry\n"
         fo.close()
         gpsp.running = False
         gpsp.join() 
 
+        GPIO.output(18, GPIO.HIGH)
+        time.sleep(1)    
+        GPIO.output(18, GPIO.LOW)
+        time.sleep(1)
         button_current = GPIO.input(25);
         flag_pressed = button_previous + button_current
 
@@ -272,7 +272,7 @@ if __name__ == '__main__':
            #print("Shutdown")
            os.system("sudo shutdown -h now")
            break
-  
+
         button_previous = button_current
         #print brojac        
         time.sleep(0.3)
