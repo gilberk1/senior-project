@@ -12,9 +12,9 @@ with open("parsy", "r") as f:
     connection = httplib.HTTPSConnection('api.parse.com', 443)
     connection.connect()
     connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
-           "latitude": coll_lat,
-           "longitude": coll_long,
-           "strength": coll_dBm ,
+           "latitude": str(coll_lat),
+           "longitude": str(coll_long),
+           "strength": "-"+str(coll_dBm),
          }), {
            "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
            "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
