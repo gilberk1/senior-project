@@ -5,9 +5,9 @@ import os, sys
 with open("parsy", "r") as f:
   for line in f:
     string = wo.readline()
-    coll_lat = string[:]
-    coll_long = string[:]
-    coll_dBm = string[:]
+    parsing = string.split(" ")
+    c = [float(e) for e in parsing]
+    coll_lat, coll_long, coll_dBm = c
 
     connection = httplib.HTTPSConnection('api.parse.com', 443)
     connection.connect()
