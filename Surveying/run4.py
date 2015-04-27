@@ -201,7 +201,7 @@ if __name__ == '__main__':
                 so.write("\n")
             so.close()
 
-            grep_com = commands.getoutput('grep -i TCNJ-DOT1X collected | sort -n -k 12 > tmp')
+            grep_com = commands.getoutput('grep -i TCNJ-DOT1X collected | sort –n -r -k 2 > tmp')
             yo = open("tmp", "r")
             string = yo.readline()
             coll_dBm = string[12:14]
