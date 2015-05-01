@@ -22,11 +22,10 @@
         border: 1px solid #999;
       }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=visualization"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=geometry,visualization"></script>
     <script src="http://www.parsecdn.com/js/parse-1.3.4.min.js"></script>
     <script>
 
-// Adding 500 Data Points
 var map, pointarray, heatmap, locations;
 var gmap, mapCanvas, mapOptions = {zoomControl: true, streetViewControl: false, noClear: true };
     function mapInitialize( mapCenter, mapZoom ) {
@@ -57,7 +56,8 @@ function initialize()
   Parse.initialize("W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM", "440W9IceQ00wcDL1nDAE8ieREow7abC0cR2lH9yF");
   var Location = Parse.Object.extend("Location");
   var query = new Parse.Query(Location);
- 
+  query.limit(10000);
+
   // Query parse for the locations
   query.find(
   {
@@ -73,7 +73,9 @@ function initialize()
         pointArray = new google.maps.MVCArray(locations);
         heatmap = new google.maps.visualization.HeatmapLayer(
         {
-          data: pointArray
+          data: pointArray,
+          maxIntensity: 10,
+          radius: 10
         });
         heatmap.setMap(map);
     },
@@ -102,9 +104,7 @@ function checkCoordinates(result)
     paths: coordinates,
   });
 
-  var inPolygon = isWithinPolygon(result, polygon);
-
-  if(inPolygon)
+  if(google.maps.geometry.poly.containsLocation(result, polygon))
   {
     return result;
   }
@@ -118,27 +118,27 @@ function changeWeight(result)
 {
   if(result <= 0 && result > -45)
   {
-    result = result + 9000;
+    result = 5;
     return result;
   }
   else if(result <= -45 && result > -65)
   {
-    result = result + 8000;
+    result = 4;
     return result;
   }
   else if(result <= -65 && result > -75)
   {
-    result = result + 7000;
+    result = 3;
     return result;
   }
   else if(result <= -75 && result > -85)
   {
-    result = result + 6000;
+    result = 2;
     return result;
   }
   else if(result <= -85 && result > -90)
   {
-    result = result + 5000;
+    result = 1;
     return result;
   }
   else
@@ -146,37 +146,6 @@ function changeWeight(result)
     result = 0;
     return result;
   }
-}
-function isWithinPolygon(coordinate, polygon)
-{
-  var oddNodes = false;
-  var x = coordinate.lat();
-  var y = coordinate.lng();
-  var bounds = polygon.getPath();
-
-  if((x > bounds.getAt(0).lat()) && (y > bounds.getAt(0).lng()))
-  {
-    if((x < bounds.getAt(1).lat()) && (y > bounds.getAt(1).lng()))
-    {
-      if((x < bounds.getAt(2).lat()) && (y < bounds.getAt(2).lng()))
-      {
-        if((x > bounds.getAt(3).lat()) && (y < bounds.getAt(3).lng()))
-        {
-          if((x > bounds.getAt(4).lat()) && (y < bounds.getAt(4).lng()))
-          {
-            if((x > bounds.getAt(5).lat()) && (y < bounds.getAt(5).lng()))
-            {
-              if((x > bounds.getAt(6).lat()) && (y > bounds.getAt(6).lng()))
-              {
-                oddNodes = true;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  return oddNodes;
 }
 
 function changeGradient()
