@@ -7,18 +7,20 @@ import json,httplib
 import serial
 from gps import *
 import RPi.GPIO as GPIO
+import commands
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(25,GPIO.IN)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(18, GPIO.OUT)
 
 button_previous = 1
 button_current = 1
 brojac = 0
 flag_pressed = 0
+i = 1
 
 os.system('clear')
-
-fo = open("log", "a+")
 
 gpsd = None #seting the global variable
 port = serial.Serial("/dev/ttyAMA0", baudrate=19200)
@@ -40,16 +42,10 @@ class GpsPoller(threading.Thread):
 
 
 if __name__ == '__main__':
-  gpsp = GpsPoller()
-  try:
-    gpsp.start()
-
+    gpsp = GpsPoller()
     while True:
-
-        print 'latitude    ' , gpsd.fix.latitude
-        print 'longitude   ' , gpsd.fix.longitude
-        print 'time utc    ' , gpsd.utc,' + ', gpsd.fix.time
-        print 'altitude (m)' , gpsd.fix.altitude
+    	gpsp.start()
+        fo = open("log", "a+")
         fo.write("GPS reading\n")
         fo.write("----------------------------------------\n")
         fo.write("latitude\n")
@@ -184,14 +180,14 @@ if __name__ == '__main__':
                     line = cell_line[-27:]
                 cells[-1].append(line.rstrip())
 
-            cells=cells[1:9]
+            cells=cells[1:]
 
             for cell in cells:
                 parsed_cells.append(parse_cell(cell))
 
             sort_cells(parsed_cells)
 
-            so = open("namefil", "r+")
+            so = open("collected", "r+")
             for cell in cells:
                 # name cell
                 sa = str(get_name(cell))
@@ -205,140 +201,64 @@ if __name__ == '__main__':
                 so.write("\n")
             so.close()
 
-            # so = open("namefil", "r+")
-            # so.seek(0,0)
-            # for cell in cells:
-            #     # name cell
-            #     sa = str(get_name(cell))
-            #     so.write(sa)
-            #     so.write("\n")
-            # lines = so.readlines()
-            # for i in range(0, len(lines)):
-            #     line = lines[i]
-            # li = lines[0]
-            # fi = lines[1]
-            # gi = lines[2]            
-            # so.close()      
+            grep_com = commands.getoutput('grep -i TCNJ-DOT1X collected | sort -n -k 12 > tmp')
+            yo = open("tmp", "r")
+            string = yo.readline()
+            coll_dBm = string[12:14]
+            print coll_dBm
+            coll_address = string[15:]
+            print coll_address
+            yo.close()
+            fo.write("Wifi reading\n")
+            fo.write("----------------------------------------\n")
+            fo.write("dBm\n")
+            fo.write(coll_dBm)
+            fo.write("\n")
+            fo.write("Addressn")
+            fo.write(coll_address)
+            fo.write("\n")
+            
+            wo = open("parsy", "a+")
+            wo.write(gpsd.fix.latitude)
+            wo.write(" ")
+            wo.write(gpsd.fix.longitude)
+            wo.write(" ")
+            wo.write(coll_dBm)
+            wo.write("\n")
+            wo.close()
 
-            # do = open("dBmfil", "r+")
-            # for cell in cells:
-            #     # dBm cell
-            #     da = str(get_dBm(cell))
-            #     do.write(da)
-            #     do.write("\n")
-            # do.close()
-            # go = open("addressfil", "r+")
-            # for cell in cells:
-            #     # address cell
-            #     ga = str(get_address(cell))
-            #     go.write(ga)
-            #     go.write("\n")
-            # go.close()
-            li = 1
-            if li == 1:
-              print li
-              do = open("dBmfil", "r+")
-              first_dBm = do.readline(3)
-              go = open("addressfil", "r+")
-              first_address = go.readline()
-              print first_address
-              lo = open("gag", "a+")
-              lo.write(str(first_dBm))
-              lo.write("\n")
-              lo.write(str(first_address))
-              lo.write("\n")
-              port.write(start+str(first_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
-              do.close()
-              go.close()
-              lo.close()
-              try:
-                  connection = httplib.HTTPSConnection('api.parse.com', 443)
-                  connection.connect()
-                  connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
-                         "latitude": gpsd.fix.latitude,
-                         "longitude": gpsd.fix.longitude,
-                         "strength": first_dBm,
-                       }), {
-                         "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
-                         "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
-                         "Content-Type": "application/json"
-                       })
-                  result = json.loads(connection.getresponse().read())
-              except Exception, e:
-                  fo.write("no connect\n")
-                  print "there was an error connecting to parse"
-                  print e
-                  pass                        
-              pass
-            # if fi == "TCNJ-DO":        	
-            #   point = do.next()
-            #   point = go.next()
-            #   second_dBm = do.readline(4)
-            #   second_address = go.readline(34)
-            #   fo.write(second_dBm)
-            #   fo.write("\n")
-            #   fo.write(second_address)
-            #   fo.write("\n")
-            #   port.write(start+str(second_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
-            #   try:
-            #     connection = httplib.HTTPSConnection('api.parse.com', 443)
-            #     connection.connect()
-            #     connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
-            #            "latitude": gpsd.fix.latitude,
-            #            "longitude": gpsd.fix.longitude,
-            #            "strength": second_dBm,
-            #          }), {
-            #            "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
-            #            "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
-            #            "Content-Type": "application/json"
-            #          })
-            #     result = json.loads(connection.getresponse().read())
-            #   except Exception, e:
-            #     fo.write("no connect\n")
-            #     print "there was an error connecting to parse"
-            #     print e
-            #     pass            
-            #   pass
-            # if gi == "TCNJ-D":       	
-            #   point = do.next()
-            #   point = do.next()
-            #   point = go.next()
-            #   point = go.next()
-            #   third_dBm = do.readline(4)
-            #   third_address = go.readline(34)
-            #   fo.write(third_dBm)
-            #   fo.write("\n")
-            #   fo.write(third_address)
-            #   fo.write("\n")
-            #   port.write(start+str(third_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
-            #   # Try to upload to Parse
-            #   try:
-            #     connection = httplib.HTTPSConnection('api.parse.com', 443)
-            #     connection.connect()
-            #     connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
-            #            "latitude": gpsd.fix.latitude,
-            #            "longitude": gpsd.fix.longitude,
-            #            "strength": third_dBm,
-            #          }), {
-            #            "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
-            #            "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
-            #            "Content-Type": "application/json"
-            #          })
-            #     result = json.loads(connection.getresponse().read())
-            #   except Exception, e:
-            #     fo.write("no connect\n")
-            #     print "there was an error connecting to parse"
-            #     print e
-            #     pass
+            port.write(start+str(coll_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
+
+            try:
+                connection = httplib.HTTPSConnection('api.parse.com', 443)
+                connection.connect()
+                connection.request('POST', '/1/classes/Stren_Loc', json.dumps({
+                       "latitude": gpsd.fix.latitude,
+                       "longitude": gpsd.fix.longitude,
+                       "strength": coll_dBm ,
+                     }), {
+                       "X-Parse-Application-Id": "W0daAi5gvdhSxp5DDXhILsSyrfhzAaE3nhyePONM",
+                       "X-Parse-REST-API-Key": "4WhVWtKsId73kCjKAdwdN9ORKcJbR2fsU4PToOVw",
+                       "Content-Type": "application/json"
+                     })
+                result = json.loads(connection.getresponse().read())
+            except Exception, e:
+                fo.write("no connect\n")
+                print "there was an error connecting to parse"
+                print e
+                pass                        
+            pass
 
         mtar()
-        i = 1
-        i = i + 1
-        print i
-        fo.write('%d' % i)
-        fo.write("\n")
+        # i = i + 1
+        # print i
+        # fo.write('%d' % i)
+        # fo.write("\n")
         fo.write("end entry\n")
         print "end entry\n"
+        fo.close()
+        gpsp.running = False
+        gpsp.join() 
 
         button_current = GPIO.input(25);
         flag_pressed = button_previous + button_current
@@ -356,10 +276,3 @@ if __name__ == '__main__':
         button_previous = button_current
         #print brojac        
         time.sleep(0.3)
-
-  except (KeyboardInterrupt, SystemExit): #when you press ctrl+c
-    print "\nKilling Thread..."
-    gpsp.running = False
-    gpsp.join() # wait for the thread to finish what it's doing
-    fo.close()
-  print "Done.\nExiting."

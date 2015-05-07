@@ -26,7 +26,11 @@
     <script src="http://www.parsecdn.com/js/parse-1.3.4.min.js"></script>
     <script>
 
+<<<<<<< HEAD
 var map, pointArray, heatmap, locations;
+=======
+var map, pointarray, heatmap, locations;
+>>>>>>> e3d9fbb8c165f07bf9910eedc36e5bd901b0b243
 var gmap, mapCanvas, mapOptions = {zoomControl: true, streetViewControl: false, noClear: true };
     function mapInitialize( mapCenter, mapZoom ) {
         mapOptions.center = mapCenter;
@@ -65,9 +69,13 @@ function getAllRecords(loopCount)
   var limit = 1000;
 
   var query = new Parse.Query(Location);
+<<<<<<< HEAD
   
   query.limit(limit);
   query.skip(limit * loopCount);
+=======
+  query.limit(10000);
+>>>>>>> e3d9fbb8c165f07bf9910eedc36e5bd901b0b243
 
   // Query parse for the locations
   query.find(
