@@ -11,14 +11,16 @@ import android.location.LocationManager;
 import android.location.LocationListener;
 import android.location.Location;
 import android.content.Context;
+import android.webkit.WebSettings;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.TextView;
 import android.webkit.WebView;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import com.parse.*;
 
 public class MainActivity extends Activity {
-
-    ParseObject locations = new ParseObject("Location");
 
     Location currentLocation;
     double longitude = 0.0;
@@ -56,6 +58,16 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void updateButton()
+    {
+        lat = (TextView) findViewById(R.id.textLat);
+        longit = (TextView) findViewById(R.id.textLong);
+        wifi = (TextView) findViewById(R.id.wifi);
+        getLinkSpeed();
+        updateGPS();
+        saveInParse(latitude, longitude, strength);
     }
 
     private class MyListener implements LocationListener {
@@ -109,6 +121,7 @@ public class MainActivity extends Activity {
 
     public void saveInParse(double latitude, double longitude, int strength)
     {
+        ParseObject locations = new ParseObject("Location");
         locations.put("latitude", latitude);
         locations.put("longitude", longitude);
         locations.put("strength", strength);
@@ -116,7 +129,11 @@ public class MainActivity extends Activity {
     }
 
     public void buttonOnClick(View v) {
-        getNextView(v);
+      if(v.getId() == R.id.update) {
+          updateButton();
+      }
+      else
+          getNextView(v);
     }
 
     public View getNextView(View v){
@@ -126,6 +143,10 @@ public class MainActivity extends Activity {
                 setContentView(R.layout.map_view);
                 webView = (WebView)findViewById(R.id.webView);
                 webView.getSettings().setJavaScriptEnabled(true);
+                CookieManager.getInstance().setAcceptCookie(true);
+                CookieManager.getInstance().getCookie("http://www.tcnj.edu/~gilberk1/GoogleMap.html");
+                WebSettings settings = webView.getSettings();
+                settings.setDomStorageEnabled(true);
                 webView.setWebViewClient(new WebViewClient());
                 webView.loadUrl("http://www.tcnj.edu/~gilberk1/GoogleMap.html");
                 break;
@@ -137,15 +158,6 @@ public class MainActivity extends Activity {
                 break;
             case(R.id.signal_strength_button):
                 setContentView(R.layout.signal_strength);
-                break;
-            case(R.id.update):
-                lat = (TextView)findViewById(R.id.textLat);
-                longit = (TextView)findViewById(R.id.textLong);
-                wifi = (TextView)findViewById(R.id.wifi);
-
-                getLinkSpeed();
-                updateGPS();
-                saveInParse(latitude, longitude, strength);
                 break;
         }
         return v;

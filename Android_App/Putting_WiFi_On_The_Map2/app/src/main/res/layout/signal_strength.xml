@@ -62,7 +62,7 @@
         android:id="@+id/update"
         android:background="@drawable/buttons"
         android:textSize="30sp"
-        android:onClick="buttonOnClick"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="buttonOnClick" />
 
 </LinearLayout>
