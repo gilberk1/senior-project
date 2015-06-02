@@ -21,7 +21,7 @@ GPIO.setup(25,GPIO.IN)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(18, GPIO.OUT)
 
-#instantiate variables for button, counter and gps 
+#Instantiate variables for button, counter and gps 
 button_previous = 1
 button_current = 1
 brojac = 0
@@ -29,12 +29,11 @@ flag_pressed = 0
 i = 1
 gpsd = None #setting the global variable
 
-# opening the serial port and defining the start and stop of the string
+# Opening the serial port and defining the start and stop of the string
 port = serial.Serial("/dev/ttyAMA0", baudrate=19200)
 start = ";"
 stop = "#"
 
-# defining GpsPoller
 class GpsPoller(threading.Thread):
 def __init__(self):
     		threading.Thread.__init__(self)
@@ -51,34 +50,34 @@ def __init__(self):
 # While loop that will collect data and write and read to/from a file
 # Also includes shutdown button for exit
 while True:
-   	os.system('rm -r /home/pi/Ras/collected')
-   	os.system('rm -r /home/pi/Ras/pearly')
+      os.system('rm -r /home/pi/Ras/collected')
+      os.system('rm -r /home/pi/Ras/pearly')
       os.system('touch /home/pi/Ras/collected')
       os.system('touch /home/pi/Ras/pearly')
  
-    	gpsp = GpsPoller()
-  	gpsp.start()
+      gpsp = GpsPoller()
+      gpsp.start()
       # Collect data from GPS
-      	lat = str(gpsd.fix.latitude)
-      	lon = str(gpsd.fix.longitude)
-      	fo = open("/home/pi/Ras/viewlog", "a+")
-      	fo.write("GPS reading\n")
-      	fo.write("----------------------------------------\n")
-      	fo.write("latitude\n")
-      	fo.write(lat)
-      	fo.write("\n")
-      	fo.write("longitude\n")
-      	fo.write(lon)
+      lat = str(gpsd.fix.latitude)
+      lon = str(gpsd.fix.longitude)
+      fo = open("/home/pi/Ras/viewlog", "a+")
+      fo.write("GPS reading\n")
+      fo.write("----------------------------------------\n")
+      fo.write("latitude\n")
+      fo.write(lat)
       fo.write("\n")
-      	fo.write("time utc\n")
-      	fo.write(str(time))
-      	fo.write("\n")
+      fo.write("longitude\n")
+      fo.write(lon)
+      fo.write("\n")
+      fo.write("time utc\n")
+      fo.write(str(time))
+      fo.write("\n")
     
-      	interface = "wlan0"
+      interface = "wlan0"
 
       # Grabs name cell
-      	def get_name(cell):
-      		return matching_line(cell,"ESSID:")[1:-1]
+      def get_name(cell):
+      	return matching_line(cell,"ESSID:")[1:-1]
       
       # Grabs quality cell, takes quality and converts to dBm
      	def get_dBm(cell):
@@ -118,8 +117,8 @@ while True:
       
       # Dictionary of defs
      	rules=
-{
-"Name":get_name,
+       {
+                "Name":get_name,
             	"dBm":get_dBm,
             	"Encryption":get_encryption,
             	"Address":get_address,
@@ -130,7 +129,7 @@ while True:
             	reverse = True
            	cells.sort(None, lambda el:el[sortby], reverse)
 
-   	columns=["Name","Address","dBm","Encryption"]
+   	    columns=["Name","Address","dBm","Encryption"]
 
     	def matching_line(lines, keyword):
            	for line in lines:
@@ -176,7 +175,7 @@ while True:
 
             	sort_cells(parsed_cells)
             
-            # Writing collected data to a file
+                # Writing collected data to a file
             	so = open("/home/pi/Ras/collected", "w")
             	for cell in cells:
                 	sa = str(get_name(cell))
@@ -189,10 +188,10 @@ while True:
                 	so.write(ga)
                 	so.write("\n")
             	so.close()
-            # grep through the collected data for, TCNJ-DOT1X with the lowest dBm value
+                # grep through the collected data for, TCNJ-DOT1X with the lowest dBm value
             	grep_com = commands.getoutput('grep -i TCNJ-DOT1X /home/pi/Ras/collected | grep -v None | sort -n -r -k 2 > /home/pi/Ras/pearly')
             
-            # Read the first line in the file and grab the dBm and address value from it
+                # Read the first line in the file and grab the dBm and address value from it
             	yo = open("/home/pi/Ras/pearly", "r")
             	string = yo.readline()
             	coll_dBm = string[12:14]
@@ -211,7 +210,7 @@ while True:
             	fo.write(coll_address)
             	fo.write("\n")
             
-            # Append the lat, long, and dBm values on a file that will be later read and then uploaded to parse
+               # Append the lat, long, and dBm values on a file that will be later read and then uploaded to parse
             	wo = open("/home/pi/Ras/parsy", "a")
             	wo.write(str(gpsd.fix.latitude))
             	wo.write(" ")
@@ -221,10 +220,11 @@ while True:
             	wo.write("\n")
             	wo.close()
 
-# Write the collected values to the GPIO pins of the raspberry pi            port.write(start+str(coll_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
+        # Write the collected values to the GPIO pins of the raspberry pi            
+        port.write(start+str(coll_dBm)+":"+str(gpsd.fix.latitude)+"!"+str(gpsd.fix.longitude)+stop)
 
-mtar()
-      fo.write("end entry\n")
+        mtar()
+        fo.write("end entry\n")
         print "end entry\n"
         fo.close()
 
