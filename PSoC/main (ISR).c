@@ -1,137 +1,96 @@
 #include <m8c.h>        // part specific constants and macros
 #include "PSoCAPI.h"    // PSoC API definitions for all User Modules
-#include "psocdynamic.h"	// PSoC API definitions for Dynamic Recongiguration
 #include <stdio.h>
 #include <string.h>
 
-#pragma interrupt_handler RX8ISR
-
-typedef
-enum
+// define states
+typedef enum
 {
-	PARSE_STATE_INIT,
+PARSE_STATE_INIT,
 	PARSE_STATE_WIFI,
 	PARSE_STATE_LAT,
 	PARSE_STATE_LONG
 } states;
 
-int rptr = 0;
-int wptr = 0;
-int str_ptr;
-char serbuf[128];
-char wifi_str[32];
-char lat[32];
-char lon[32];
-char tempchar;
-long count=0;
-states state = PARSE_STATE_INIT;
-
-char debugstring[32];
-
 void main(void)
 {	
-    // Enable Global Interrupts
-    M8C_EnableGInt;      
-   
-    // Start baud rate generator
-    Counter8_1_Start();       
-   
-    LCD_1_Start();
+int str_ptr;
+	char wifi_str[32];
+	char lat[32];
+	char lon[32];
+	char newchar;
 	
-    // Load the receiver configuration
-    LoadConfig_Receiver();
-	
-	RX8_2_Start(RX8_2_PARITY_NONE);
-	
-	RX8_2_EnableInt();
+	states state = PARSE_STATE_INIT;     // set to initial state
+	M8C_EnableGInt;      
+   	Counter8_1_Start();       
+    	LCD_1_Start();
+	RX8_1_Start(RX8_1_PARITY_NONE);
 	
 	while (1)
-	{
-		LCD_1_Position(1,0);
-		csprintf(debugstring,"%d %d",rptr,wptr);
-		LCD_1_PrString(debugstring);
-		// check for new char
-		++count;
-		LCD_1_Position(1,8);
-		if ((count >> 12) & 1)
+	{	
+		newchar = RX8_1_cGetChar();     // read character
+		if (newchar == ';')
 		{
-			LCD_1_PrCString("*");
+			state = PARSE_STATE_WIFI;     // move to next state
+			str_ptr = 0;     // reset string pointer
 		}
 		else
 		{
-			LCD_1_PrCString("_");
-		}
-		while (rptr != wptr)
-		{
-			// new char
-			char newchar;
-			newchar = serbuf[rptr];
-			rptr++;
-			if (rptr == 128)
+			switch (state)
 			{
-				rptr = 0;
-			}
-			if (newchar == ';')
-			{
-				state = PARSE_STATE_WIFI;
-				str_ptr = 0;
-			}
-			else
-			{
-				switch (state)
-				{
-					case (PARSE_STATE_WIFI):
-						if (newchar == ':')
-						{
-							state = PARSE_STATE_LAT;
-							str_ptr = 0;
-						}
-						else
-						{
-							wifi_str[str_ptr++] = newchar;
-							LCD_1_Position(0,0);
-							LCD_1_PrString(wifi_str);
-						}
-						break;
-					case (PARSE_STATE_LAT):
-						if (newchar == '!')
-						{
-							state = PARSE_STATE_LONG;
-							str_ptr = 0;
-						}
-						else
-						{
-							lat[str_ptr++] = newchar;
-							LCD_1_Position(0,4);
-							LCD_1_PrString(wifi_str);
-						}
-						break;
-					case (PARSE_STATE_LONG):
-						if (newchar == '#')
-						{
-							state = PARSE_STATE_INIT;
-							str_ptr = 0;
-						}
-						else
-						{
-							lon[str_ptr++] = newchar;
-						}
-						break;
-				}
+				case (PARSE_STATE_INIT):
+					if (newchar == ';')
+					{
+						state = PARSE_STATE_WIFI;
+						str_ptr = 0;
+					}
+					break;
+				case (PARSE_STATE_WIFI):     // print signal strength
+					if (newchar != ':')
+						// put character in string
+						wifi_str[str_ptr++] = newchar;
+					else
+					{
+						// print string and label
+						wifi_str[str_ptr++]='\0';
+						state = PARSE_STATE_LAT;
+						LCD_1_Position(0,0);
+						LCD_1_PrCString("dBm");
+						LCD_1_Position(1,0);
+						LCD_1_PrString(wifi_str);
+						str_ptr = 0;
+					}
+					break;
+				case (PARSE_STATE_LAT):     // print latitude
+					if (newchar != '!')
+						lat[str_ptr++] = newchar;
+					else
+					{
+						lat[str_ptr++]='\0';
+						state = PARSE_STATE_LONG;
+						LCD_1_Position(0,4);
+						LCD_1_PrCString("A");
+						LCD_1_Position(0,5);
+						LCD_1_PrString(lat);
+						str_ptr = 0;
+					}
+					break;
+				case (PARSE_STATE_LONG):     // print longitude
+					if (newchar != '#')
+						lon[str_ptr++] = newchar;
+					else		
+					{
+						lon[str_ptr++]='\0';
+						state = PARSE_STATE_INIT;
+						LCD_1_Position(1,4);
+						LCD_1_PrCString("O");
+						LCD_1_Position(1,5);
+						LCD_1_PrString(lon);
+						str_ptr = 0;
+					}
+					break;
+				
 			}
 		}
 	}
-}
-	
-void RX8ISR(void)
-{
-	serbuf[wptr++] = tempchar;   // Put the new char into our ring buffer, advance write ptr
-	
-	tempchar = RX8_2_cReadChar();  // Use the data access method, or read the register directly
- 
-	if (wptr == 128)   // Check to see if we need to wrap wptr
-		{              
-         	wptr = 0;
-        } 	
-	return;
 }
