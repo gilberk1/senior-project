@@ -60,6 +60,7 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    //Updates all text fields to display collected data
     public void updateButton()
     {
         lat = (TextView) findViewById(R.id.textLat);
@@ -69,7 +70,7 @@ public class MainActivity extends Activity {
         updateGPS();
         saveInParse(latitude, longitude, strength);
     }
-
+    //Implementation of LocationListener
     private class MyListener implements LocationListener {
         @Override
         public void onLocationChanged(Location location) {
@@ -90,7 +91,7 @@ public class MainActivity extends Activity {
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
     }
-
+    //Uses location listener to get GPS coordinates
     public void updateGPS()
     {
         LocationManager LocManage = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -108,7 +109,7 @@ public class MainActivity extends Activity {
             longit.setText("Longitude: " + longitude);
         }
     }
-
+    //Gets RSSI in dBm
     public void getLinkSpeed()
     {
         WifiManager mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
@@ -118,7 +119,7 @@ public class MainActivity extends Activity {
 
         wifi.setText("Wi-Fi Strength: " + strength);
     }
-
+    //Creates new parse objects and saves to database
     public void saveInParse(double latitude, double longitude, int strength)
     {
         ParseObject locations = new ParseObject("Location");
@@ -127,7 +128,7 @@ public class MainActivity extends Activity {
         locations.put("strength", strength);
         locations.saveInBackground();
     }
-
+    //handles all button clicks
     public void buttonOnClick(View v) {
       if(v.getId() == R.id.update) {
           updateButton();
@@ -135,7 +136,7 @@ public class MainActivity extends Activity {
       else
           getNextView(v);
     }
-
+    //Switches between views
     public View getNextView(View v){
         switch(v.getId())
         {
