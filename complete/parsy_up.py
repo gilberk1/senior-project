@@ -10,8 +10,8 @@ with open("parsy","r") as f:
     		string = wo.readline()
     		parsing = string.split(" ")
     		c = [float(e) for e in parsing]
-    		coll_lat, coll_long, coll_dBm = c
-            # applying calibration
+    	  coll_lat, coll_long, coll_dBm = c
+    	  # applying calibration
     		a = coll_dBm/10
     		base = 5
     		exp = a - base
