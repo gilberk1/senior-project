@@ -2,6 +2,7 @@ from __future__ import division
 import json,httplib
 import time
 import os, sys
+# Python script that takes the parsy script from surv_script.py and uploads its contents to parse
 wo = open("parsy", "r")
 with open("parsy","r") as f:
   for line in f:
@@ -9,6 +10,7 @@ with open("parsy","r") as f:
     parsing = string.split(" ")
     c = [float(e) for e in parsing]
     coll_lat, coll_long, coll_dBm = c
+    # Applying calibration
     a = coll_dBm/10
     base = 5
     exp = a - base
